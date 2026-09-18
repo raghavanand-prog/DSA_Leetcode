@@ -13,6 +13,7 @@
 | Day | Problem | Difficulty | Topic | Solution Link | Date |
 |---|---|---|---|---|---|
 | 1 | Concatenation of Array | Easy | Array | [Solution](solutions/arrays/concatenation-of-array/) | Sep 17, 2026 |
+| 2 | Shuffle the Array | Easy | Array | [Solution](solutions/arrays/shuffle-the-array/) | Sep 18, 2026 |
 
 ---
 
@@ -56,7 +57,7 @@ Each problem folder contains:
 
 ## Progress
 
-**Days Completed:** 1 / 60
+**Days Completed:** 2 / 60
 
 **Topics Covered:** (will update as problems are solved)
 
