@@ -15,6 +15,7 @@
 | 1 | Concatenation of Array | Easy | Array | [Solution](solutions/arrays/concatenation-of-array/) | Sep 17, 2026 |
 | 2 | Shuffle the Array | Easy | Array | [Solution](solutions/arrays/shuffle-the-array/) | Sep 18, 2026 |
 | 3 | Max Consecutive Ones | Easy | Array | [Solution](solutions/arrays/max-consecutive-ones/) | Sep 19, 2026 |
+| 4 | Set Mismatch | Easy | Array | [Solution](solutions/arrays/set-mismatch/) | Sep 20, 2026 |
 
 ---
 
@@ -58,7 +59,7 @@ Each problem folder contains:
 
 ## Progress
 
-**Days Completed:** 3 / 60
+**Days Completed:** 4 / 60
 
 **Topics Covered:** (will update as problems are solved)
 
