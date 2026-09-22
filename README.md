@@ -16,6 +16,7 @@
 | 2 | Shuffle the Array | Easy | Array | [Solution](solutions/arrays/shuffle-the-array/) | Sep 18, 2026 |
 | 3 | Max Consecutive Ones | Easy | Array | [Solution](solutions/arrays/max-consecutive-ones/) | Sep 19, 2026 |
 | 4 | Set Mismatch | Easy | Array | [Solution](solutions/arrays/set-mismatch/) | Sep 20, 2026 |
+| 5 | Find X Value of Array II | Hard | Array | [Solution](solutions/arrays/find-x-value-of-array-ii/) | Sep 22, 2026 |
 
 ---
 
@@ -39,6 +40,7 @@ solutions/
 
 Each problem folder contains:
 - `Solution.java` — Clean, interview-quality code
+- `Test.java` — Comprehensive test cases
 - `README.md` — Problem explanation, approach, complexity
 
 ---
@@ -48,20 +50,31 @@ Each problem folder contains:
 1. **Input:** LeetCode URL
 2. **Read:** Problem via browser
 3. **Solve:** Write Java solution
-4. **Validate:** Test examples + edge cases
-5. **Update:** Add to tracker + create files
-6. **Review:** Check git diff
-7. **Approve:** Manual approval checkpoint
-8. **Commit:** `feat(leetcode): add day XX <problem>`
-9. **Push:** To GitHub
+4. **Test:** Comprehensive test cases covering edge cases
+5. **Document:** README with complexity analysis
+6. **Review:** Manual approval checkpoint
+7. **Approve:** Confirmation before submission
+8. **Submit:** To LeetCode from browser
+9. **Commit:** `feat(leetcode): add day XX <problem>`
+10. **Push:** To GitHub from Mac terminal
 
 ---
 
 ## Progress
 
-**Days Completed:** 4 / 60
+**Days Completed:** 5 / 60
 
-**Topics Covered:** (will update as problems are solved)
+**Array Problems Solved:** 5 (all Easy to Hard)
+
+---
+
+## Key Achievements
+
+- Day 1-4: Solved foundational array problems (Easy difficulty)
+- Day 5: Solved Hard array problem (Find X Value of Array II)
+- Strong foundation in array manipulation patterns
+- Comprehensive test coverage with 10+ test cases per problem
+- Interview-quality code with proper complexity analysis
 
 ---
 
@@ -71,3 +84,5 @@ Each problem folder contains:
 - No blind copying from online sources
 - Proper complexity analysis for each problem
 - Edge cases covered and tested
+- All code compiles and passes local tests before LeetCode submission
+
