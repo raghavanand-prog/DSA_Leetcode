@@ -1,0 +1,163 @@
+#!/usr/bin/env bash
+# Daily LeetCode helper for the 60-day challenge.
+#
+#   leet new <leetcode-url|slug> <topic> <Easy|Medium|Hard>   scaffold today's problem
+#   leet done [slug]                                          test, log in tracker, commit, push
+#   leet status                                               progress + whether today is done
+#   leet remind                                               macOS notification if nothing committed today
+#
+# Topics: arrays strings linked_list stack queue trees graphs binary_search
+#         dynamic_programming math greedy backtracking
+set -euo pipefail
+
+REPO="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+cd "$REPO"
+
+die() { echo "❌ $*" >&2; exit 1; }
+
+slug_of() { local s="${1%/}"; s="${s%/description}"; s="${s##*/problems/}"; echo "${s##*/}"; }
+
+title_of() { echo "$1" | tr '-' ' ' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)} 1'; }
+
+find_dir() { find solutions -mindepth 2 -maxdepth 2 -type d -name "$1" | head -1; }
+
+committed_today() { [ -n "$(git log --since=midnight --format=%h 2>/dev/null | head -1)" ]; }
+
+cmd_new() {
+  [ $# -eq 3 ] || die "usage: leet new <leetcode-url|slug> <topic> <Easy|Medium|Hard>"
+  local slug topic diff title dir
+  slug="$(slug_of "$1")"; topic="$2"; diff="$3"; title="$(title_of "$slug")"
+  dir="solutions/$topic/$slug"
+  [ -e "$dir" ] && die "$dir already exists"
+  mkdir -p "$dir"
+
+  cat > "$dir/Solution.java" <<EOF
+class Solution {
+    // TODO: paste the method signature from LeetCode and implement it
+}
+EOF
+
+  cat > "$dir/Test.java" <<EOF
+public class Test {
+    public static void main(String[] args) {
+        Solution solution = new Solution();
+
+        // TODO: add test cases (examples + edge cases), e.g.
+        // assert solution.method(input) == expected : "Test 1 failed";
+        // System.out.println("✅ Test 1 passed");
+    }
+}
+EOF
+
+  cat > "$dir/README.md" <<EOF
+# $title
+
+**LeetCode Problem:** [$title](https://leetcode.com/problems/$slug/)
+
+**Difficulty:** $diff
+
+**Topic:** $(title_of "${topic//_/-}")
+
+---
+
+## Problem
+
+TODO
+
+## Approach
+
+TODO
+
+## Complexity
+
+- **Time:** TODO
+- **Space:** TODO
+EOF
+  echo "📁 Created $dir"
+  echo "   Solve it, write tests, fill in the README, then run: leet done"
+}
+
+cmd_done() {
+  local dir slug
+  if [ $# -ge 1 ]; then
+    slug="$(slug_of "$1")"; dir="$(find_dir "$slug")"
+    [ -n "$dir" ] || die "no folder for '$slug'"
+  else
+    # newest problem folder that isn't in the tracker yet
+    dir=""
+    for d in $(ls -td solutions/*/*/); do
+      d="${d%/}"
+      grep -q "($d/)" README.md || { dir="$d"; break; }
+    done
+    [ -n "$dir" ] || die "nothing new to log. Start one with: leet new <url> <topic> <difficulty>"
+    slug="$(basename "$dir")"
+  fi
+
+  for f in Solution.java Test.java README.md; do
+    [ -f "$dir/$f" ] || die "$dir/$f is missing"
+  done
+  if grep -l "TODO" "$dir"/Solution.java "$dir"/Test.java "$dir"/README.md >/dev/null 2>&1; then
+    grep -l "TODO" "$dir"/Solution.java "$dir"/Test.java "$dir"/README.md | sed 's/^/   still has TODO: /'
+    die "finish the solution, tests and README first"
+  fi
+
+  echo "🧪 Running tests for $slug..."
+  local tmp; tmp="$(mktemp -d)"
+  javac -d "$tmp" "$dir"/Solution.java "$dir"/Test.java || die "compile failed"
+  java -ea -cp "$tmp" Test || die "tests failed"
+  rm -rf "$tmp"
+
+  local diff topic title
+  diff="$(sed -n 's/^\*\*Difficulty:\*\* *//p' "$dir/README.md" | head -1)"
+  topic="$(basename "$(dirname "$dir")")"
+  title="$(sed -n '1s/^# *//p' "$dir/README.md")"
+
+  local day
+  day="$(python3 - "$dir" "$title" "$diff" "$topic" <<'PY'
+import re, sys, datetime
+d, title, diff, topic = sys.argv[1:]
+text = open("README.md", encoding="utf-8").read()
+rows = re.findall(r"^\| *(\d+) *\|.*\|$", text, flags=re.M)
+day = max(map(int, rows), default=0) + 1
+topic_label = {"arrays": "Array", "strings": "String", "linked_list": "Linked List",
+               "binary_search": "Binary Search", "dynamic_programming": "DP"}.get(topic, topic.replace("_", " ").title())
+date = datetime.date.today().strftime("%b %-d, %Y")
+row = f"| {day} | {title} | {diff} | {topic_label} | [Solution]({d}/) | {date} |"
+lines = text.split("\n")
+last = max(i for i, l in enumerate(lines) if re.match(r"^\| *\d+ *\|", l))
+lines.insert(last + 1, row)
+text = "\n".join(lines)
+text = re.sub(r"\*\*Days Completed:\*\* *\d+", f"**Days Completed:** {day}", text)
+open("README.md", "w", encoding="utf-8").write(text)
+print(day)
+PY
+)"
+
+  local nn; nn="$(printf '%02d' "$day")"
+  git add "$dir" README.md
+  git commit -q -m "feat(leetcode): add day $nn $(echo "$title" | tr 'A-Z' 'a-z')"
+  git push -q
+  echo "✅ Day $day logged, committed and pushed: $title ($diff)"
+}
+
+cmd_status() {
+  local done; done="$(sed -n 's/^\*\*Days Completed:\*\* *\([0-9]*\).*/\1/p' README.md)"
+  echo "📊 Days completed: ${done:-0} / 60"
+  if committed_today; then echo "✅ You've committed today"; else echo "⏳ Nothing committed today yet"; fi
+  local ahead; ahead="$(git rev-list --count @{u}..HEAD 2>/dev/null || echo 0)"
+  [ "$ahead" != "0" ] && echo "⚠️  $ahead local commit(s) not pushed. Run: git push"
+  return 0
+}
+
+cmd_remind() {
+  committed_today && exit 0
+  osascript -e 'display notification "Solve today'"'"'s problem: leet new <url> <topic> <difficulty>" with title "60-Day LeetCode" subtitle "Nothing committed yet today" sound name "Glass"'
+}
+
+case "${1:-}" in
+  new)    shift; cmd_new "$@" ;;
+  done)   shift; cmd_done "$@" ;;
+  status) cmd_status ;;
+  remind) cmd_remind ;;
+  *)      sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//' ;;
+esac
