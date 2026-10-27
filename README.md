@@ -1,5 +1,11 @@
 # 60-Day LeetCode Challenge
 
+**My Java solutions to one LeetCode coding problem a day for 60 days, each with its own tests and a short explanation.**
+
+Why it exists: to build a strong foundation in data structures and algorithms for cloud security interviews.
+
+**How to read it:** pick a day in the tracker below and open its folder: `Solution.java` is the answer, `Test.java` checks it, and `README.md` explains the approach.
+
 **Goal:** Solve 60 LeetCode problems in 60 days and build a strong DSA foundation for Cloud Security interviews.
 
 **Language:** Java
